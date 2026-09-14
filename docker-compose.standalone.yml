@@ -32,8 +32,7 @@ services:
   redis:
     image: redis:8.2.3
     ports:
-      - 127.0.0.1:${STANDALONE_MYSQL_PORT:?Missing STANDALONE_MYSQL_PORT}:3306
-      - "10.0.0.1:${VPS_MYSQL_PORT:?Missing VPS_MYSQL_PORT}:3306"
+      - 127.0.0.1:${STANDALONE_REDIS_PORT:?Missing STANDALONE_REDIS_PORT}:6379
     volumes:
       - redis-data:/data
 
