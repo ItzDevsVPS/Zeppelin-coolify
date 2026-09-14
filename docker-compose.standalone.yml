@@ -45,6 +45,7 @@ services:
 
   migrate:
     image: dragory/zeppelin
+    restart: no
     depends_on:
       mysql:
         condition: service_healthy
