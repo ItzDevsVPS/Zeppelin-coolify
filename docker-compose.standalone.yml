@@ -14,10 +14,12 @@ services:
       MYSQL_PASSWORD: ${STANDALONE_MYSQL_PASSWORD?:Missing STANDALONE_MYSQL_PASSWORD}
     ports:
       - 127.0.0.1:${STANDALONE_MYSQL_PORT:?Missing STANDALONE_MYSQL_PORT}:3306
+      - "10.0.0.1:${VPS_MYSQL_PORT:?Missing VPS_MYSQL_PORT}:3306"
     # If you're upgrading from an older version, you can load your old database by switching the volumes below.
     # Then, take a database dump from the old database, switch the volumes back, and load the dump into the new database.
     volumes:
       - mysql-data:/var/lib/mysql
+      - mysql-backup:/backup
       # - ./docker/production/data/mysql:/var/lib/mysql
     command:
       - "--skip-log-bin"
@@ -29,15 +31,18 @@ services:
 
   redis:
     image: redis:8.2.3
+    ports:
+      - 127.0.0.1:${STANDALONE_MYSQL_PORT:?Missing STANDALONE_MYSQL_PORT}:3306
+      - "10.0.0.1:${VPS_MYSQL_PORT:?Missing VPS_MYSQL_PORT}:3306"
     volumes:
       - redis-data:/data
 
-  nginx:
-    build:
-      context: .
-      dockerfile: docker/production/nginx/Dockerfile
-    ports:
-      - "${STANDALONE_WEB_PORT:?Missing STANDALONE_WEB_PORT}:443"
+  # nginx:
+  #   build:
+  #     context: .
+  #     dockerfile: docker/production/nginx/Dockerfile
+  #   ports:
+  #     - "${STANDALONE_WEB_PORT:?Missing STANDALONE_WEB_PORT}:443"
 
   migrate:
     image: dragory/zeppelin
@@ -58,6 +63,8 @@ services:
 
   api:
     image: dragory/zeppelin
+    ports:
+      - "10.0.0.1:${VPS_API_PORT:?Missing VPS_API_PORT}:3001"
     depends_on:
       migrate:
         condition: service_completed_successfully
@@ -80,6 +87,8 @@ services:
   
   dashboard:
     image: dragory/zeppelin
+    ports:
+      - "10.0.0.1:${VPS_DASHBOARD_PORT:?Missing VPS_DASHBOARD_PORT}:3002"
     depends_on:
       migrate:
         condition: service_completed_successfully
